@@ -18,3 +18,6 @@ transform = BashOperator(dag=dag, task_id='transform', bash_command='sleep 5')
 load = EmptyOperator(dag=dag, task_id='load')
 
 extract >> transform >> load
+
+# backfill command: 
+# airflow dags backfill --start-date 2023-05-10 --end-date 2023-05-16 my-first-example
