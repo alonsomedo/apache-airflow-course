@@ -5,16 +5,18 @@ from airflow.operators.bash import BashOperator
 from datetime import datetime
 
 
-dag = DAG(dag_id="my-first-example-2",
-          start_date=datetime(2023,5,16),
-          schedule='* * * * *',
-          catchup=True
+dag = DAG(dag_id="example-2",
+          start_date=datetime(2023,5,14),
+          schedule='@daily',
+          catchup=True,
+          max_active_runs=1
           )
 
-extract = EmptyOperator(dag=dag, task_id='extract')
+#extract =  BashOperator(dag=dag, task_id='extract', bash_command='exit 1', depends_on_past=True)
+extract =  BashOperator(dag=dag, task_id='extract', bash_command='exit 1', wait_for_downstream=True)
 
-transform = BashOperator(dag=dag, task_id='transform', bash_command='sleep 120')
+transform = BashOperator(dag=dag, task_id='transform', bash_command='sleep 10')
 
-load = EmptyOperator(dag=dag, task_id='load')
+load = BashOperator(dag=dag, task_id='load', bash_command='sleep 10')
 
 extract >> transform >> load
