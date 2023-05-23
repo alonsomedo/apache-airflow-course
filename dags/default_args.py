@@ -11,7 +11,7 @@ default_args = {
     "depends_on_past": True,
     "execution_timeout": timedelta(seconds=7),
     "retries": 3,
-    "retry_delay": timedelta(secods=10)
+    "retry_delay": timedelta(seconds=10)
 }
 
 dag = DAG(dag_id="default_args",
@@ -22,7 +22,7 @@ dag = DAG(dag_id="default_args",
 
 extract = EmptyOperator(dag=dag, task_id='extract')
 
-transform = BashOperator(dag=dag, task_id='transform', bash_command='sleep 10')
+transform = BashOperator(dag=dag, task_id='transform', bash_command='sleep 10', execution_timeout=timedelta(seconds=15))
 
 load = EmptyOperator(dag=dag, task_id='load')
 
