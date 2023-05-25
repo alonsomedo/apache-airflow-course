@@ -1,0 +1,60 @@
+schedule: 
+  prod: null
+  staging: null
+  dev: null
+  
+#timeout parameters
+dag_run_timeout: 12 #hours
+
+#tags to filter and grouping
+tags: 
+  - data
+  
+# These are the configurations for the DAG
+owner: &owner data_eng
+depends_on_past: &depends_on_past False
+
+dag_args:
+  prod:
+    start_date: 'yyyy-mm-dd'
+    max_active_runs: 1
+    catchup: False
+    max_active_tasks: 1    
+  staging:    
+    start_date: 'yyyy-mm-dd'
+    max_active_runs: 1
+    catchup: False
+    max_active_tasks: 1    
+  dev:
+    start_date: null
+    max_active_runs: 1
+    catchup: False
+    max_active_tasks: 1
+        
+default_args:
+  prod:
+    owner: *owner
+    retries: 3
+    retry_delay: 300
+    email_on_retry: False
+    email_on_failure: True
+    email: []    
+    depends_on_past: *depends_on_past
+  staging:    
+    owner: *owner
+    retries: 3
+    retry_delay: 300
+    email_on_retry: False
+    email_on_failure: True
+    email: []  
+    depends_on_past: *depends_on_past
+  dev:
+    owner: *owner
+    max_active_runs: 1
+    email_on_retry: False
+    email_on_failure: False
+    depends_on_past: *depends_on_past       
+
+#Ping to slack channel (OPTIONAL)
+slack:
+  channel: '#name-channel'

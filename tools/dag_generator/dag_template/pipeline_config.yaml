@@ -1,0 +1,7 @@
+# API params
+param_name:
+  - value_1
+  - value_2
+  - value_3
+
+endpoint: https://{url}/{version}/{}/
