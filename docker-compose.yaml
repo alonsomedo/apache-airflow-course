@@ -278,6 +278,22 @@ services:
       <<: *airflow-common-depends-on
       airflow-init:
         condition: service_completed_successfully
+  
+  ### Services Added Manually
+  postgres-dwh:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: dwh
+      POSTGRES_PASSWORD: dwh
+      POSTGRES_DB: dwh
+    ports:
+      - 5455:5432
+    volumes:
+      - postgres-dwh-volume:/var/lib/postgresql/data
+    restart: always
+
 
 volumes:
   postgres-db-volume:
+  ## Named volumes added manually
+  postgres-dwh-volume:
