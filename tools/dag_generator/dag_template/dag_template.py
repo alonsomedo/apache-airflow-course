@@ -62,8 +62,8 @@ with DAG(dag_file_name,
     ##### DECLARING THE OPERATORS ######
     
     # Declare Dummy Operators
-    start_operator = DummyOperator(task_id='start-operator')
-    end_operator = DummyOperator(task_id='end-operator')
+    start = DummyOperator(task_id='start-operator')
+    end = DummyOperator(task_id='end-operator')
        
 
     # Custom python operator
@@ -79,4 +79,4 @@ with DAG(dag_file_name,
         }
     )
      
-    start_operator >> hello_world >> end_operator
+    start >> hello_world >> end
