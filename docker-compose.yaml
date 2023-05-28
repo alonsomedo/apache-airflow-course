@@ -63,6 +63,7 @@ x-airflow-common:
     ## Added manually
     AIRFLOW__SCHEDULER__DAG_DIR_LIST_INTERVAL: 90
     AIRFLOW__WEBSERVER__EXPOSE_CONFIG: 'true'
+    ENVIRONMENT: 'prod'
 
   volumes:
     - ./dags:/opt/airflow/dags

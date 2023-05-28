@@ -34,7 +34,7 @@ dag_file_name = os.path.basename(__file__).split('.')[0]
 dag_config = get_config(dag_file_name = dag_file_name, config_filename = 'dag_config.yaml')
 pipeline_config = get_config(dag_file_name = dag_file_name, config_filename = 'pipeline_config.yaml')
 
-env="dev"
+env=os.getenv('ENVIRONMENT')
 default_arguments = dag_config['default_args'][env]
 
 # Getting variables of pipeline configs
