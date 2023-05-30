@@ -18,6 +18,8 @@ from airflow.providers.postgres.operators.postgres import PostgresOperator
 from import_soccer_data_to_pg.functions.get_soccer_team_players import get_soccer_team_players
 from import_soccer_data_to_pg.functions.load_soccer_players_into_tmp import load_soccer_players_into_tmp
 
+from airflow.utils.task_group import TaskGroup
+
 # Declare configuration variables
 dag_file_name = os.path.basename(__file__).split('.')[0]
 dag_config = get_config(dag_file_name = dag_file_name, config_filename = 'dag_config.yaml')
@@ -29,6 +31,7 @@ default_arguments = dag_config['default_args'][env]
 # Getting variables of pipeline configs
 endpoint = pipeline_config['endpoint']
 soccer_teams_ids = pipeline_config['soccer_teams_ids']
+soccer_positions = pipeline_config['soccer_positions']
 
 #Airflow docstring
 doc_md = get_md(dag_file_name, 'README.md')
@@ -54,7 +57,7 @@ with DAG(dag_file_name,
     # Declare Dummy Operators
     start = DummyOperator(task_id='start')
     end = DummyOperator(task_id='end')
-    wait = DummyOperator(task_id='wait')
+    #wait = DummyOperator(task_id='wait')
 
     create_tmp_players_table = PostgresOperator(
         task_id='create_tmp_players_table',
@@ -94,10 +97,27 @@ with DAG(dag_file_name,
                     "tmp_table": 'bronze.tmp_players_table_{{ ds_nodash }}'
                 }
             )
-            
             get_soccer_players >> load_players_into_tmp
+            
+    with TaskGroup('players_by_position') as players_by_position:
+        for position in soccer_positions:
+            create_position_table = PostgresOperator(
+                task_id=f'create_{position}_table',
+                sql=get_sql(dag_file_name, 'create_players_table.sql'),
+                params={"table_name": f"bronze.soccer_players_{position}"}
+            )
+
+            insert_players_by_position = PostgresOperator(
+                task_id=f'insert_{position}_players',
+                sql=get_sql(dag_file_name, 'insert_by_position.sql'),
+                params={
+                        "table_name": f"bronze.soccer_players_{position}",
+                        "position": position
+                        }
+            )
+            merge_tmp_into_players_table >> create_position_table >> insert_players_by_position
        
-        start >> [create_tmp_players_table, create_players_table]  >> get_soccer_players >> load_players_into_tmp >> merge_tmp_into_players_table >> drop_tmp_players_table >> end
+    start >> [create_tmp_players_table, create_players_table]  >> soccer_squads  >> merge_tmp_into_players_table >> players_by_position >> drop_tmp_players_table >> end
     
     
     

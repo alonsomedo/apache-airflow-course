@@ -24,4 +24,5 @@ def get_soccer_team_players(soccer_team_id, endpoint):
     logging.info(df)
     
     df.to_csv(f"/tmp/{soccer_team_id}.csv", sep='\t', index=False, header=False)
+    # df.to_csv(f"/opt/airflow/data/{soccer_team_id}.csv", sep='\t', index=False, header=False)
     logging.info(f"The file {soccer_team_id}.csv was generated successfully.")
