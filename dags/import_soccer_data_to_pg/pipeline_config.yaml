@@ -1,0 +1,6 @@
+soccer_teams_ids:
+  barcelona: 529
+  real_madrid: 541
+
+
+endpoint: https://v3.football.api-sports.io/players/squads
