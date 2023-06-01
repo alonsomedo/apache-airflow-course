@@ -14,6 +14,7 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from airflow.providers.slack.operators.slack_webhook import SlackWebhookOperator
+from amd.operators.rowcount_to_slack import RowCountToSlackChannelOperator
 
 # Importing python functions
 from import_soccer_data_to_pg.functions.get_soccer_team_players import get_soccer_team_players
@@ -120,15 +121,23 @@ with DAG(dag_file_name,
        
     slack_notification = SlackWebhookOperator(
         task_id='slack_notification',
-        slack_webhook_conn_id = 'slack_conn',
+        slack_webhook_conn_id= 'slack_conn',
         message='El proceso de importar squads termino satisfactoriamente. :large_green_circle: :red_circle:',
         channel='#airflow-alerts',
         icon_emoji=':large_green_circle:'
     )
     
+    rowcount_notification = RowCountToSlackChannelOperator(
+        task_id='rowcount_notification',
+        slack_conn='slack_conn',
+        message='El area de marketing ya puede usar la información',
+        table_name='bronze.soccer_players',
+        table_predicate="where position = 'Goalkeeper'"
+    )
+    
     
     start >> [create_tmp_players_table, create_players_table]  >> soccer_squads  >> merge_tmp_into_players_table 
-    merge_tmp_into_players_table >> players_by_position >> drop_tmp_players_table >> slack_notification >> end
+    merge_tmp_into_players_table >> players_by_position >> drop_tmp_players_table >> [slack_notification, rowcount_notification] >> end
     
     
     
