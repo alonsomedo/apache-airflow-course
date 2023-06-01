@@ -13,6 +13,7 @@ from airflow.operators.dummy_operator import DummyOperator
 from airflow.operators.bash import BashOperator
 from airflow.operators.python_operator import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
+from airflow.providers.slack.operators.slack_webhook import SlackWebhookOperator
 
 # Importing python functions
 from import_soccer_data_to_pg.functions.get_soccer_team_players import get_soccer_team_players
@@ -115,9 +116,19 @@ with DAG(dag_file_name,
                         "position": position
                         }
             )
-            merge_tmp_into_players_table >> create_position_table >> insert_players_by_position
+            create_position_table >> insert_players_by_position
        
-    start >> [create_tmp_players_table, create_players_table]  >> soccer_squads  >> merge_tmp_into_players_table >> players_by_position >> drop_tmp_players_table >> end
+    slack_notification = SlackWebhookOperator(
+        task_id='slack_notification',
+        slack_webhook_conn_id = 'slack_conn',
+        message='El proceso de importar squads termino satisfactoriamente. :large_green_circle: :red_circle:',
+        channel='#airflow-alerts',
+        icon_emoji=':large_green_circle:'
+    )
+    
+    
+    start >> [create_tmp_players_table, create_players_table]  >> soccer_squads  >> merge_tmp_into_players_table 
+    merge_tmp_into_players_table >> players_by_position >> drop_tmp_players_table >> slack_notification >> end
     
     
     
