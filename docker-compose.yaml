@@ -307,6 +307,18 @@ services:
   #   ports:
   #     - 3309:3306
 
+  # SFTP
+  # user: foo
+  # pass: pass
+  # sftp:
+  #   image: atmoz/sftp
+  #   volumes:
+  #       - ./sftp:/home/foo/upload
+  #   ports:
+  #       - "2222:22"
+  #   command: foo:pass:1001
+
+
 volumes:
   postgres-db-volume:
   ## Named volumes added manually
