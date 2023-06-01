@@ -293,9 +293,22 @@ services:
     volumes:
       - postgres-dwh-volume:/var/lib/postgresql/data
     restart: always
-
+  
+  # Default user is root
+  # mysql_dwh:
+  #   image: mysql:8.0
+  #   restart: always
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: dwh
+  #     MYSQL_DATABASE: dwh
+  #   container_name: mysql_dwh
+  #   volumes:
+  #     - mysql-dwh-volume:/var/lib/mysql
+  #   ports:
+  #     - 3309:3306
 
 volumes:
   postgres-db-volume:
   ## Named volumes added manually
   postgres-dwh-volume:
+  # mysql-dwh-volume:
